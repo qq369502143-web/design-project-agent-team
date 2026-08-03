@@ -78,7 +78,10 @@ Test at least these scenarios when practical:
 3. Proposal-only request: no files are changed before approval.
 4. Partial approval: the skill revises and re-requests approval rather than inferring consent.
 5. Approved creation: only allowlisted files change and validation is run.
-6. Activation: after separate user approval to create a visible task, a fresh task loads the roles and a coordination smoke test reports structured handoffs.
+6. Activation prompt: after `CONFIGURED`, the skill actively asks whether to use temporary subagents, visible role tasks, or no activation.
+7. No implied consent: configuration approval alone creates neither subagent threads nor visible tasks.
+8. Temporary activation: only needed roles are spawned, concurrency is respected, and one writer is preserved.
+9. Visible activation: only selected role tasks are created in a project state that can read the approved configuration; each receives a role brief and separate transcript warning.
 
 During proposal-only testing, avoid commands that can create `__pycache__`, coverage data, tool caches, or logs. If the project is not a Git repository, report Git status as unavailable rather than clean.
 

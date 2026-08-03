@@ -16,7 +16,7 @@ Respond in the user's language. Keep repository-specific rules in the repository
 1. Begin with read-only assessment.
 2. Treat a broad initial request to "create an agent team" as authorization to assess and propose, not as approval of a plan that does not exist yet.
 3. Do not create or edit project files until the user explicitly approves the identified proposal version and its file allowlist.
-4. Do not create visible independent tasks unless the user separately asks for them after reviewing the distinction between project agents, temporary subagents, and visible tasks.
+4. Do not create visible independent tasks unless the user selects that option after reviewing the distinction between project agents, temporary subagents, and visible tasks. Proactively present the activation choice after configuration succeeds.
 5. Do not stage, commit, push, merge, rebase, tag, or open a pull request without separate Git authorization.
 6. Never expand authorization for network access, live services, providers, accounts, credentials, profiles, ACLs, production operations, or destructive actions.
 7. Use one writer for an overlapping change set. Parallelize read-only discovery and review only when useful and allowed by repository instructions.
@@ -126,10 +126,36 @@ Run proportionate offline verification before reporting success:
 4. Search for forbidden capabilities, secrets, personal paths, provider-specific credentials, implicit policy bypasses, and unapproved network or production instructions.
 5. Confirm each role inherits or explicitly references the applicable repository instructions and canonical documents.
 6. Run repository configuration tests, lint, or other relevant offline checks when available.
-7. After separate user approval to create a visible task, start a fresh trusted task for load testing because existing tasks may not hot-reload new project configuration. Without that approval, stop at `CONFIGURED` after static validation.
-8. When activation is approved, run a coordination smoke test: discovery, at least one independent review dimension, implementation only if authorized, and validation handoff.
+7. Mark the team `CONFIGURED` after checks 1 through 6 pass, then present the mandatory activation choice below.
+8. When activation is approved and the selected task type can load the configuration, run a coordination smoke test: discovery, at least one independent review dimension, implementation only if authorized, and validation handoff.
 
 If a check fails, do not declare the team ready. Fix only within the approved file scope; otherwise return to the approval gate.
+
+### Mandatory activation choice
+
+After reaching `CONFIGURED`, always ask the user one concise, blocking question with these mutually exclusive options:
+
+1. **Temporary subagents**: run the approved roles as bounded subagent threads for the current outcome. Explain that they appear in the Subagents activity area rather than as long-lived sidebar tasks. Respect the configured concurrency cap, batch roles when needed, and keep one writer.
+2. **Visible role tasks**: create one user-owned, sidebar-visible task for each user-selected role. Explain that every task has its own transcript and does not automatically share complete conversation history.
+3. **No activation**: leave the team at `CONFIGURED` and create no threads or tasks.
+
+Do not infer a choice from Phase 2 configuration approval. If the user does not answer, create nothing.
+
+Before executing either activation option, verify that the target task or thread can read the new project configuration and canonical repository instructions. Existing tasks may not hot-reload new agent files. If configuration visibility is uncertain, explain the issue and request the smallest necessary action; do not silently commit files, change Git state, or create a task that cannot see the approved configuration.
+
+For **Temporary subagents**:
+
+- Spawn only roles needed for the selected outcome; do not spawn every configured role mechanically.
+- If the current task has not loaded the new roles, ask the user to start a fresh project task or separately approve creation of a fresh coordinator task before spawning.
+- Wait for requested subagents, collect structured handoffs, and summarize them in the coordinator task.
+
+For **Visible role tasks**:
+
+- Treat the user's selection as authorization to create only the named role tasks, not as authorization for Git, network, provider, credential, privileged, destructive, or production actions.
+- Create each task in the same saved project and project state that contains the approved configuration. Do not choose a clean default-branch worktree when the required configuration exists only as uncommitted working-tree files.
+- Initialize each task with its role, approved proposal ID, canonical instruction files, current milestone or task status, write boundary, prohibitions, and handoff contract.
+- Keep reviewer tasks read-only and create at most one write-capable role task for an overlapping change set.
+- Return the created task names and links or task identifiers, and name the coordinator responsible for synchronizing decisions between them.
 
 ## Final handoff
 
@@ -143,4 +169,4 @@ Report:
 6. authorization boundaries and operations not performed;
 7. activation instructions and recommended next task.
 
-State whether the team is merely configured, successfully loaded in a separately approved fresh task, or fully coordination-tested. These are different completion levels. Do not downgrade a statically valid `CONFIGURED` result merely because visible-task activation was not authorized; record activation as not performed.
+State whether the team is merely configured, successfully loaded in a separately approved fresh task, or fully coordination-tested. These are different completion levels. At `CONFIGURED`, include the mandatory activation question in the final handoff. Do not downgrade a statically valid `CONFIGURED` result merely because activation was not selected; record activation as awaiting user choice.

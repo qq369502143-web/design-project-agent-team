@@ -1,7 +1,7 @@
 interface:
   display_name: "Project Agent Team Designer"
   short_description: "Assess, design, create, and verify a minimal Codex agent team"
-  default_prompt: "Use $design-project-agent-team to assess this repository, propose a minimal agent team, and create it only after I explicitly approve the plan."
+  default_prompt: "Use $design-project-agent-team to assess this repository, create and validate the approved minimal agent team, then ask whether I want temporary subagents, visible role tasks, or no activation."
 
 policy:
   allow_implicit_invocation: true
