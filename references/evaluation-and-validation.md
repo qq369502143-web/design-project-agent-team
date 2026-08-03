@@ -81,7 +81,10 @@ Test at least these scenarios when practical:
 6. Activation prompt: after `CONFIGURED`, the skill actively asks whether to use temporary subagents, visible role tasks, or no activation.
 7. No implied consent: configuration approval alone creates neither subagent threads nor visible tasks.
 8. Temporary activation: only needed roles are spawned, concurrency is respected, and one writer is preserved.
-9. Visible activation: only selected role tasks are created in a project state that can read the approved configuration; each receives a role brief and separate transcript warning.
+9. Visible activation mechanism: use a user-owned visible task operation such as `create_thread`, never an internal `spawn_agent` substitute.
+10. Visible initialization: every selected role gets a durable `<project> | <role>` title, an initialization-only prompt, a `READY` response, and then an idle waiting state.
+11. Visible handoff: return task identifiers and openable links or creation markers, explain separate transcripts, and ask whether to pin the conversations.
+12. No autonomous loop: visible role conversations receive later work only through explicit user or coordinator follow-up; they do not continuously run or automatically message one another.
 
 During proposal-only testing, avoid commands that can create `__pycache__`, coverage data, tool caches, or logs. If the project is not a Git repository, report Git status as unavailable rather than clean.
 
@@ -90,6 +93,7 @@ During proposal-only testing, avoid commands that can create `__pycache__`, cove
 - `PROPOSED`: assessment complete; awaiting approval.
 - `CONFIGURED`: approved files created and statically validated.
 - `LOADED`: a fresh task confirms the configuration is available.
+- `TASKS-READY`: selected long-lived visible role conversations completed `READY` initialization and are idle awaiting follow-up.
 - `TEAM-VERIFIED`: coordination smoke test passes.
 - `BLOCKED`: an approval, dependency, or safety gate prevents further progress.
 

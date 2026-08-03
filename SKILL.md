@@ -1,6 +1,6 @@
 ---
 name: design-project-agent-team
-description: Assess a code repository and design a minimal Codex agent team, present a role, configuration, permission, and validation proposal, wait for explicit approval, then create and verify project agents. Use when the user asks to inspect a project and recommend or create reusable custom Codex agent roles, an agent team, .codex/agents configuration, an orchestration workflow, or long-lived project tasks. Do not use for one-off subtask delegation alone.
+description: Assess a code repository and design a minimal Codex agent team, present a role, configuration, permission, and validation proposal, wait for explicit approval, then create, verify, and activate project agents as temporary subagents or long-lived visible role conversations. Use when the user asks to inspect a project and recommend or create reusable custom Codex agent roles, an agent team, .codex/agents configuration, an orchestration workflow, or long-lived project tasks. Do not use for one-off subtask delegation alone.
 ---
 
 # Design Project Agent Team
@@ -136,7 +136,7 @@ If a check fails, do not declare the team ready. Fix only within the approved fi
 After reaching `CONFIGURED`, always ask the user one concise, blocking question with these mutually exclusive options:
 
 1. **Temporary subagents**: run the approved roles as bounded subagent threads for the current outcome. Explain that they appear in the Subagents activity area rather than as long-lived sidebar tasks. Respect the configured concurrency cap, batch roles when needed, and keep one writer.
-2. **Visible role tasks**: create one user-owned, sidebar-visible task for each user-selected role. Explain that every task has its own transcript and does not automatically share complete conversation history.
+2. **Long-lived visible role conversations**: create one user-owned, sidebar-visible task for each user-selected role. Explain that every task has its own transcript and does not automatically share complete conversation history. Long-lived means resumable and available for follow-up, not continuously running.
 3. **No activation**: leave the team at `CONFIGURED` and create no threads or tasks.
 
 Do not infer a choice from Phase 2 configuration approval. If the user does not answer, create nothing.
@@ -149,13 +149,20 @@ For **Temporary subagents**:
 - If the current task has not loaded the new roles, ask the user to start a fresh project task or separately approve creation of a fresh coordinator task before spawning.
 - Wait for requested subagents, collect structured handoffs, and summarize them in the coordinator task.
 
-For **Visible role tasks**:
+For **Long-lived visible role conversations**:
 
 - Treat the user's selection as authorization to create only the named role tasks, not as authorization for Git, network, provider, credential, privileged, destructive, or production actions.
+- Use the product's user-owned visible task creation operation (`create_thread` when available). Never substitute the internal subagent operation (`spawn_agent`), collaboration worker, or background-only delegation for a visible role conversation.
 - Create each task in the same saved project and project state that contains the approved configuration. Do not choose a clean default-branch worktree when the required configuration exists only as uncommitted working-tree files.
-- Initialize each task with its role, approved proposal ID, canonical instruction files, current milestone or task status, write boundary, prohibitions, and handoff contract.
+- Set an explicit durable title in the form `<project> | <role>` or the user's equivalent. Do not title the task `Initialize <role>` or describe it as a one-time background job.
+- Make the creation prompt initialization-only. Tell the task to read the canonical project instructions and its role file, report `READY`, accepted task types, prohibitions, escalation conditions, and material workspace risks, then stop and wait. Do not assign substantive project work in the creation prompt.
+- Include the approved proposal ID, canonical instruction files, current milestone or task status, write boundary, prohibitions, and handoff contract in the initialization prompt so the role does not depend on hidden parent-chat context.
 - Keep reviewer tasks read-only and create at most one write-capable role task for an overlapping change set.
-- Return the created task names and links or task identifiers, and name the coordinator responsible for synchronizing decisions between them.
+- Treat task creation as asynchronous. Wait until every initialization turn completes or requests attention before claiming readiness. If creation returns only a queued client identifier, wait for a usable task identifier.
+- Interpret `idle` after a successful `READY` response as ready and waiting for follow-up, not as a failed or still-running background agent.
+- Return every durable title, task identifier, readiness state, and openable task link or product creation marker. Name the coordinator responsible for synchronizing decisions between conversations.
+- Ask whether the user wants the new role conversations pinned in the sidebar. Do not pin or archive them without the user's answer.
+- Explain that later work starts only when the user opens a role conversation or the coordinator sends an explicit follow-up message. The role conversations do not continuously run, initiate new work, or automatically talk to one another.
 
 ## Final handoff
 
@@ -169,4 +176,4 @@ Report:
 6. authorization boundaries and operations not performed;
 7. activation instructions and recommended next task.
 
-State whether the team is merely configured, successfully loaded in a separately approved fresh task, or fully coordination-tested. These are different completion levels. At `CONFIGURED`, include the mandatory activation question in the final handoff. Do not downgrade a statically valid `CONFIGURED` result merely because activation was not selected; record activation as awaiting user choice.
+State whether the team is merely configured, has long-lived conversations initialized as `TASKS-READY`, is successfully loaded for temporary subagents, or is fully coordination-tested. These are different completion levels. At `CONFIGURED`, include the mandatory activation question in the final handoff. Do not downgrade a statically valid `CONFIGURED` result merely because activation was not selected; record activation as awaiting user choice.
